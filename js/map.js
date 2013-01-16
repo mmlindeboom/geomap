@@ -6,21 +6,12 @@
 
 ;(function ( $, window, document, undefined ) {
 
-    // undefined is used here as the undefined global variable in ECMAScript 3 is
-    // mutable (ie. it can be changed by someone else). undefined isn't really being
-    // passed in so we can ensure the value of it is truly undefined. In ES5, undefined
-    // can no longer be modified.
+    var mapData = {};
 
-    // window and document are passed through as local variable rather than global
-    // as this (slightly) quickens the resolution process and can be more efficiently
-    // minified (especially when both are regularly referenced in your plugin).
-
-    // Create the defaults once
     var pluginName = "geoMap",
         defaults = {
             mapZoom: undefined,
-            latCoord: undefined,
-            longCoord: undefined,
+            mapData: {},
             geoLocate: true,
             fitWindow: false
         };
@@ -36,20 +27,68 @@
         this._defaults = defaults;
         this._name = pluginName;
 
-        this.init();
+        this.geoLocate();
+        //this.init();
     }
 
     Plugin.prototype = {
-      
-        init: function() {
+
+        geoLocate: function() {
+            var pos;
+            var map;
+            if(navigator.geolocation) {
+                 navigator.geolocation.getCurrentPosition(function(position) {
+                    pos = new google.maps.LatLng(position.coords.latitude,
+                                                 position.coords.longitude);
+                    generateMap(pos);
+                  });
+
+                  var generateMap = function() {
+                     var defaults = {
+                        mapsData:{}
+                     };
+
+                     var options = $.extend(defaults, options);
+                     var mapOptions = {
+                        zoom: 8,
+                        center: pos,//new google.maps.LatLng(mapData.lat, mapData.long),
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                      };
+
+                    map = new google.maps.Map(document.getElementById(canvas), mapOptions);
+
+                     var contentString = "Your current location";
+                        var infowindow = new google.maps.InfoWindow({
+                          content: contentString
+                       });
+
+                    var marker = new google.maps.Marker({
+                            position: map.getCenter(),
+                            map: map,
+                            title: 'Click to zoom',
+                            animation: google.maps.Animation.DROP
+                    });
+
+                    google.maps.event.addListener(marker, 'click', function() {
+                      infowindow.open(map,marker);
+                     });
+                };
+            } else {
+                handleError();
+            }
+        },
+        init: function(pos) {
             self = this;
             /* Setting up the map
             *----------------------*/
+            
+            console.log(pos);
 
+            mapData =  { 'lat': this.options.latCoord, 'long': this.options.longCoord};
            
             var mapOptions = {
                 zoom: this.options.mapZoom,
-                center: new google.maps.LatLng(this.options.latCoord, this.options.longCoord),
+                center: pos,//new google.maps.LatLng(mapData.lat, mapData.long),
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             };
             var map = new google.maps.Map(document.getElementById(canvas), mapOptions);
