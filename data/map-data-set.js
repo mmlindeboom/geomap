@@ -1,22 +1,20 @@
 var returnedMapData = {
-
 	pinpoints: [
-	
 		{
- 
-            lat: 40.719558,
-            long: -73.9977949
-        },
-		
-		{
-			lat: 39.85166380,
-            long: -75.34891329999999
+			text:"Philadelphia",
+			lat:39.998012,
+			long: -75.144793
 		},
 		
-        {
-                lat: 39.38401590,
-			    long: -74.42674880
-            }
-            
+		{
+			text: "boston",
+			lat:42.321597,
+			long: -71.089115
+		},
+			{
+			text: "North",
+			lat: 49.321597,
+			long: -71.089115
+		}
 	]
-}
+};
