@@ -7,7 +7,6 @@
 ;(function ( $, window, document, undefined ) {
 		var map;
 		var markers = {pinpoints: []}; //archive for all pinpoints on the map
-		var newMarkers = {pinpoints: []}; //array to add new pinpoints on map
 		var mapData;
 		var generatedMarker = [];
 		var pluginName = "geoMap",
@@ -15,7 +14,8 @@
 						mapZoom: undefined,
 						mapData: undefined,
 						geoLocate: true,
-						fitWindow: false
+						fitWindow: false,
+						clickEl: undefined
 				};
 
 		// The actual plugin constructor
@@ -41,7 +41,7 @@
 				init: function(self) {
 						var opts = this.options; //hand off top level options to lower functions
 						if (opts.mapData !== undefined) {
-							self.generateMap(opts);
+							self.generateMap(markers);
 						}
 						if (opts.geoLocate) {
 							if(navigator.geolocation) {
@@ -49,61 +49,76 @@
 										lat = position.coords.latitude;
 										lng = position.coords.longitude;
 										markers = { pinpoints: [{ text: 'Your location', lat: lat, long: lng }] };
-										self.generateMap(opts);
+										self.generateMap(markers, opts);
 									});
 									} else {
 											handleError();
 									}
 						} else {
-								self.generateMap(opts);
+								self.generateMap(markers);
 						}
 						
 				},
+
+				/*  addLocations method sets default mapData
+				*  @desc: on el click, opts.mapData gets passed to generateMap
+				*-------------------------------------------------------------*/
 				addLocations : function(self, opts) {
-						self.generateMap({
+						self.handleMarkers({
 						mapData: 'data/map-data-set.js'
 					});
 				},
-				
-				generateMap : function(opts) {
+
+				generateMap: function(markers, opts) {
+					var mapOptions = {
+									zoom:6,
+									center: new google.maps.LatLng(markers.pinpoints[0].lat, markers.pinpoints[0].long),
+									mapTypeId: google.maps.MapTypeId.ROADMAP
+								};
+							map = new google.maps.Map(document.getElementById(canvas), mapOptions);
+							self.handleMarkers(opts);
+				},
+				handleMarkers : function(opts) {
 
 							var defaults = {
 								mapData: opts.mapData
 							};
 							var options = $.extend(defaults, options);
 
-							var mapOptions = {
-									zoom:6,
-									center: new google.maps.LatLng(markers.pinpoints[0].lat, markers.pinpoints[0].long),
-									mapTypeId: google.maps.MapTypeId.ROADMAP
-								};
-							map = new google.maps.Map(document.getElementById(canvas), mapOptions);
-							
 							var infowindow = new google.maps.InfoWindow(), marker, i;
-								console.log('The markers are ',markers.pinpoints);
 
+							// retrieve new markers via ajax
 							getMarkers(markers);
 
+
 							function updateMap(markers) {
-								console.log('Updating map.');
-								var parseArray;
+								var latlng;
+								var mapbounds;
+								var bounds = new google.maps.LatLngBounds();
 								i = generatedMarker.length;
-								console.log(i);
 								for (i ;i < markers.pinpoints.length; i++) {
-									console.log('Inside the loop', i, map);
+									latlng = new google.maps.LatLng(markers.pinpoints[i].lat, markers.pinpoints[i].long);
+									if (markers.pinpoints[i].lat === latlng.lat) {
+										console.log(true);
+										return true;
+									}
 									generatedMarker[i] = new google.maps.Marker({
-											position: new google.maps.LatLng(markers.pinpoints[i].lat, markers.pinpoints[i].long),
-											map: map
-											//animation: google.maps.Animation.DROP
+											position: latlng,
+											map: map,
+											animation: google.maps.Animation.DROP,
+											zoom: 6
 									});
-									newMarker = generatedMarker[i];
+									
 									google.maps.event.addListener(generatedMarker[i], 'click', (function(generatedMarker, i) {
 												return function() {
 														infowindow.setContent(markers.pinpoints[i].text);
 														infowindow.open(map, generatedMarker);
 												};
 										})(generatedMarker[i], i));
+									mapbounds = new google.maps.LatLng(markers.pinpoints[i].lat, markers.pinpoints[i].long);
+									bounds.extend(mapbounds);
 								}
+								map.fitBounds(bounds);
 							}
 							function getMarkers(markers) {
 								if (options.mapData !== undefined) {
@@ -117,19 +132,13 @@
 										}
 									});
 								} else {
-									console.log('We got to the else condition');
 									updateMap(markers);
 								}
 							}
 							function addMarkers(data) {
+
 								for (j=0; j < options.mapsData.pinpoints.length; j++) {
-									newMarkers.pinpoints.push(options.mapsData.pinpoints[j]);
-								} 
-								updateMarkers(newMarkers);
-							}
-							function updateMarkers(newMarkers) {
-								for (k=0; k < newMarkers.pinpoints.length; k++) {
-										markers.pinpoints.push(newMarkers.pinpoints[k]);
+									markers.pinpoints.push(options.mapsData.pinpoints[j]);
 								}
 								updateMap(markers);
 							}
