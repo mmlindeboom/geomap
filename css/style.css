@@ -76,3 +76,9 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
   border: 1px solid #000;
   display: block;
 }
+/* line 17, ../sass/style.scss */
+.container #nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

@@ -5,15 +5,18 @@
 @import "compass/reset";
 
 .container {
-  width:960px;
-  margin:0 auto;
-  .map {
-    width:960px;
-    height:600px;
-    margin: 10px;
-    border:1px solid #000;
-    display:block;
-  }
-
+	width:960px;
+	margin:0 auto;
+	.map {
+		width:960px;
+		height:600px;
+		margin: 10px;
+		border:1px solid #000;
+		display:block;
+	}
+	#nav {
+		position:absolute;
+		top:0;
+		left:0;
+	}
 }
-  

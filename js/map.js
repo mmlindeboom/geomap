@@ -6,7 +6,7 @@
 
 ;(function ( $, window, document, undefined ) {
 		var map;
-		var markers = {pinpoints: []}; //archive for all pinpoints on the map
+		var markers = {locations: []}; //archive for all locations on the map
 		var mapData;
 		var generatedMarker = [];
 		var pluginName = "geoMap",
@@ -15,7 +15,8 @@
 						mapData: undefined,
 						geoLocate: true,
 						fitWindow: false,
-						clickEl: undefined
+						clickEl: undefined,
+						navigation: false
 				};
 
 		// The actual plugin constructor
@@ -29,7 +30,7 @@
 				this._name = pluginName;
 				this.init(self);
 
-				$('.addMarker').on({
+				$(this.options.clickEl).on({
 					click: function() {
 						console.log(self);
 						self.addLocations(self);
@@ -48,7 +49,7 @@
 								navigator.geolocation.getCurrentPosition(function(position) {
 										lat = position.coords.latitude;
 										lng = position.coords.longitude;
-										markers = { pinpoints: [{ text: 'Your location', lat: lat, long: lng }] };
+										markers = { locations: [{ text: 'Your location', lat: lat, long: lng }] };
 										self.generateMap(markers, opts);
 									});
 									} else {
@@ -72,7 +73,7 @@
 				generateMap: function(markers, opts) {
 					var mapOptions = {
 									zoom:6,
-									center: new google.maps.LatLng(markers.pinpoints[0].lat, markers.pinpoints[0].long),
+									center: new google.maps.LatLng(markers.locations[0].lat, markers.locations[0].long),
 									mapTypeId: google.maps.MapTypeId.ROADMAP
 								};
 							map = new google.maps.Map(document.getElementById(canvas), mapOptions);
@@ -96,9 +97,9 @@
 								var mapbounds;
 								var bounds = new google.maps.LatLngBounds();
 								i = generatedMarker.length;
-								for (i ;i < markers.pinpoints.length; i++) {
-									latlng = new google.maps.LatLng(markers.pinpoints[i].lat, markers.pinpoints[i].long);
-									if (markers.pinpoints[i].lat === latlng.lat) {
+								for (i ;i < markers.locations.length; i++) {
+									latlng = new google.maps.LatLng(markers.locations[i].lat, markers.locations[i].long);
+									if (markers.locations[i].lat === latlng.lat) {
 										console.log(true);
 										return true;
 									}
@@ -111,12 +112,15 @@
 									
 									google.maps.event.addListener(generatedMarker[i], 'click', (function(generatedMarker, i) {
 												return function() {
-														infowindow.setContent(markers.pinpoints[i].text);
+														infowindow.setContent(markers.locations[i].text);
 														infowindow.open(map, generatedMarker);
 												};
 										})(generatedMarker[i], i));
-									mapbounds = new google.maps.LatLng(markers.pinpoints[i].lat, markers.pinpoints[i].long);
+									mapbounds = new google.maps.LatLng(markers.locations[i].lat, markers.locations[i].long);
 									bounds.extend(mapbounds);
+								}
+								if (opts.navigation) {
+									buildNav(markers);
 								}
 								map.fitBounds(bounds);
 							}
@@ -137,11 +141,27 @@
 							}
 							function addMarkers(data) {
 
-								for (j=0; j < options.mapsData.pinpoints.length; j++) {
-									markers.pinpoints.push(options.mapsData.pinpoints[j]);
+								for (j=0; j < options.mapsData.locations.length; j++) {
+									markers.locations.push(options.mapsData.locations[j]);
 								}
+								buildNav(markers);
 								updateMap(markers);
 							}
+							function locationExists(markers, position) {
+								var _i, markerExists, _len, currentMarker;
+								_i = 0;
+								_len = markers.locations.length;
+								markerExists = false;
+								currentMarker = markers.locations[position];
+								console.log(generatedMarker[position]);
+							}
+							function buildNav(markers) {
+									for (var ii=0; ii < markers.locations.length; ii++) {
+										locationExists(markers, ii);
+										$('#nav').append('<li class="'+markers.locations[ii].id+'"><a href="">'+markers.locations[ii].text+'</html></li>');
+									}
+							}
+							//buildNav(markers);
 						},
 
 				
