@@ -5,10 +5,11 @@
  */
 
 ;(function ( $, window, document, undefined ) {
+		var GeoMap = GeoMap || {};
 		var map;
-		var markers = {locations: []}; //archive for all locations on the map
+		GeoMap.markers = {locations: []}; //archive for all locations on the map
 		var mapData;
-		var generatedMarker = [];
+		GeoMap.generatedMarker = [];
 		var pluginName = "geoMap",
 				defaults = {
 						mapZoom: undefined,
@@ -42,21 +43,21 @@
 				init: function(self) {
 						var opts = this.options; //hand off top level options to lower functions
 						if (opts.mapData !== undefined) {
-							self.generateMap(markers);
+							self.generateMap();
 						}
 						if (opts.geoLocate) {
 							if(navigator.geolocation) {
 								navigator.geolocation.getCurrentPosition(function(position) {
 										lat = position.coords.latitude;
 										lng = position.coords.longitude;
-										markers = { locations: [{ text: 'Your location', lat: lat, long: lng }] };
-										self.generateMap(markers, opts);
+										GeoMap.markers = { locations: [{ text: 'Your location', lat: lat, long: lng }] };
+										self.generateMap(opts);
 									});
 									} else {
 											handleError();
 									}
 						} else {
-								self.generateMap(markers);
+								self.generateMap();
 						}
 						
 				},
@@ -70,10 +71,10 @@
 					});
 				},
 
-				generateMap: function(markers, opts) {
+				generateMap: function(opts) {
 					var mapOptions = {
 									zoom:6,
-									center: new google.maps.LatLng(markers.locations[0].lat, markers.locations[0].long),
+									center: new google.maps.LatLng(GeoMap.markers.locations[0].lat, GeoMap.markers.locations[0].long),
 									mapTypeId: google.maps.MapTypeId.ROADMAP
 								};
 							map = new google.maps.Map(document.getElementById(canvas), mapOptions);
@@ -89,42 +90,42 @@
 							var infowindow = new google.maps.InfoWindow(), marker, i;
 
 							// retrieve new markers via ajax
-							getMarkers(markers);
+							getMarkers();
 
 
-							function updateMap(markers) {
+							function updateMap() {
 								var latlng;
 								var mapbounds;
 								var bounds = new google.maps.LatLngBounds();
-								i = generatedMarker.length;
-								for (i ;i < markers.locations.length; i++) {
-									latlng = new google.maps.LatLng(markers.locations[i].lat, markers.locations[i].long);
-									if (markers.locations[i].lat === latlng.lat) {
+								i = GeoMap.generatedMarker.length;
+								for (i ;i < GeoMap.markers.locations.length; i++) {
+									latlng = new google.maps.LatLng(GeoMap.markers.locations[i].lat, GeoMap.markers.locations[i].long);
+									if (GeoMap.markers.locations[i].lat === latlng.lat) {
 										console.log(true);
 										return true;
 									}
-									generatedMarker[i] = new google.maps.Marker({
+									GeoMap.generatedMarker[i] = new google.maps.Marker({
 											position: latlng,
 											map: map,
 											animation: google.maps.Animation.DROP,
 											zoom: 6
 									});
-									
-									google.maps.event.addListener(generatedMarker[i], 'click', (function(generatedMarker, i) {
+									 count = GeoMap.generatedMarker;
+									google.maps.event.addListener(count[i], 'click', (function(count, i) {
 												return function() {
-														infowindow.setContent(markers.locations[i].text);
-														infowindow.open(map, generatedMarker);
+														infowindow.setContent(GeoMap.markers.locations[i].text);
+														infowindow.open(map, count);
 												};
-										})(generatedMarker[i], i));
-									mapbounds = new google.maps.LatLng(markers.locations[i].lat, markers.locations[i].long);
+										})(GeoMap.generatedMarker[i], i));
+									mapbounds = new google.maps.LatLng(GeoMap.markers.locations[i].lat, GeoMap.markers.locations[i].long);
 									bounds.extend(mapbounds);
 								}
 								if (opts.navigation) {
-									buildNav(markers);
+									buildNav();
 								}
 								map.fitBounds(bounds);
 							}
-							function getMarkers(markers) {
+							function getMarkers() {
 								if (options.mapData !== undefined) {
 									$.ajax({
 										type: 'get',
@@ -136,32 +137,33 @@
 										}
 									});
 								} else {
-									updateMap(markers);
+									updateMap();
 								}
 							}
 							function addMarkers(data) {
 
 								for (j=0; j < options.mapsData.locations.length; j++) {
-									markers.locations.push(options.mapsData.locations[j]);
+									GeoMap.markers.locations.push(options.mapsData.locations[j]);
 								}
-								buildNav(markers);
-								updateMap(markers);
+								buildNav();
+								updateMap();
 							}
-							function locationExists(markers, position) {
+							function locationExists(position) {
 								var _i, markerExists, _len, currentMarker;
 								_i = 0;
-								_len = markers.locations.length;
+								_len = GeoMap.markers.locations.length;
 								markerExists = false;
-								currentMarker = markers.locations[position];
-								console.log(generatedMarker[position]);
+								currentMarker = GeoMap.markers.locations[position];
+								connect = GeoMap.generatedMarker.length;
+								console.log(connect, currentMarker);
 							}
-							function buildNav(markers) {
-									for (var ii=0; ii < markers.locations.length; ii++) {
-										locationExists(markers, ii);
-										$('#nav').append('<li class="'+markers.locations[ii].id+'"><a href="">'+markers.locations[ii].text+'</html></li>');
+							function buildNav() {
+									for (var ii=0; ii < GeoMap.markers.locations.length; ii++) {
+										locationExists(ii);
+										$('#nav').append('<li class="'+GeoMap.markers.locations[ii].id+'"><a href="">'+GeoMap.markers.locations[ii].text+'</html></li>');
 									}
 							}
-							//buildNav(markers);
+							//buildNav();
 						},
 
 				
