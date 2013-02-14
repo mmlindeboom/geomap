@@ -63,12 +63,12 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
   display: block;
 }
 
-/* line 7, ../sass/style.scss */
+/* line 8, ../sass/style.scss */
 .container {
   width: 960px;
   margin: 0 auto;
 }
-/* line 10, ../sass/style.scss */
+/* line 11, ../sass/style.scss */
 .container .map {
   width: 960px;
   height: 600px;
@@ -76,9 +76,39 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
   border: 1px solid #000;
   display: block;
 }
-/* line 17, ../sass/style.scss */
+/* line 18, ../sass/style.scss */
 .container #nav {
   position: absolute;
   top: 0;
   left: 0;
+  font-family: Helvetica;
+  background: #333;
+  padding: 5px;
+}
+/* line 25, ../sass/style.scss */
+.container #nav li {
+  background: #333;
+  padding: 7px;
+  border: 1px solid #333;
+}
+/* line 29, ../sass/style.scss */
+.container #nav li:hover {
+  background: #222;
+  border: 1px solid #555;
+}
+/* line 33, ../sass/style.scss */
+.container #nav li span {
+  display: inline-block;
+  width: 0px;
+  height: 0px;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid white;
+  margin: 0 10px 0 0;
+}
+/* line 39, ../sass/style.scss */
+.container #nav a {
+  font-family: Helvetica;
+  color: #fff;
+  text-decoration: none;
 }

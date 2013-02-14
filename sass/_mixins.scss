@@ -1,0 +1,30 @@
+@mixin arrow($direction, $size, $color){
+	@if unitless($size) {
+		@warn "Assuming size: #{$size} to be in pixels or ems";
+	}
+	@if $direction == up {
+		width:0px; 
+		height:0px; 
+		border-left:$size solid transparent;  
+		border-right:$size solid transparent; 
+		border-bottom:$size solid $color; 
+	}@else if $direction == down {
+		width:0px; 
+		height:0px; 
+		border-left:$size solid transparent;  
+		border-right:$size solid transparent; 
+		border-top:$size solid $color; 
+	}@else if $direction == right {
+		width:0px; 
+		height:0px; 
+		border-top:$size solid transparent;  
+		border-bottom:$size solid transparent; 
+		border-left:$size solid $color; 
+	}@else if $direction == left {
+		width:0px; 
+		height:0px; 
+		border-top:$size solid transparent;  
+		border-bottom:$size solid transparent; 
+		border-right:$size solid $color; 
+	}
+}

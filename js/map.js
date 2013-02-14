@@ -99,18 +99,22 @@
 								var bounds = new google.maps.LatLngBounds();
 								i = GeoMap.generatedMarker.length;
 								for (i ;i < GeoMap.markers.locations.length; i++) {
+									
 									latlng = new google.maps.LatLng(GeoMap.markers.locations[i].lat, GeoMap.markers.locations[i].long);
-									if (GeoMap.markers.locations[i].lat === latlng.lat) {
-										console.log(true);
-										return true;
-									}
+
 									GeoMap.generatedMarker[i] = new google.maps.Marker({
 											position: latlng,
 											map: map,
 											animation: google.maps.Animation.DROP,
 											zoom: 6
 									});
-									 count = GeoMap.generatedMarker;
+										if (window.console) {console.log('Above build call', +i);}
+										
+
+									count = GeoMap.generatedMarker;
+
+										buildNav(i);
+									
 									google.maps.event.addListener(count[i], 'click', (function(count, i) {
 												return function() {
 														infowindow.setContent(GeoMap.markers.locations[i].text);
@@ -119,9 +123,6 @@
 										})(GeoMap.generatedMarker[i], i));
 									mapbounds = new google.maps.LatLng(GeoMap.markers.locations[i].lat, GeoMap.markers.locations[i].long);
 									bounds.extend(mapbounds);
-								}
-								if (opts.navigation) {
-									buildNav();
 								}
 								map.fitBounds(bounds);
 							}
@@ -145,7 +146,6 @@
 								for (j=0; j < options.mapsData.locations.length; j++) {
 									GeoMap.markers.locations.push(options.mapsData.locations[j]);
 								}
-								buildNav();
 								updateMap();
 							}
 							function locationExists(position) {
@@ -157,11 +157,9 @@
 								connect = GeoMap.generatedMarker.length;
 								console.log(connect, currentMarker);
 							}
-							function buildNav() {
-									for (var ii=0; ii < GeoMap.markers.locations.length; ii++) {
-										locationExists(ii);
-										$('#nav').append('<li class="'+GeoMap.markers.locations[ii].id+'"><a href="">'+GeoMap.markers.locations[ii].text+'</html></li>');
-									}
+							function buildNav(position) {
+									if (window.console) {console.log('built '+ position);}
+										$('#nav').append('<li class="'+GeoMap.markers.locations[position].id+'"><span></span><a href="">'+GeoMap.markers.locations[position].text+'</html></li>');
 							}
 							//buildNav();
 						},
